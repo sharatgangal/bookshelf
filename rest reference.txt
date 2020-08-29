@@ -1,0 +1,309 @@
+REST DEPENDENCY:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+_____________________________________________________________________________________________________________________________________________________________
+							1.spring web mvc
+												FOR spring mvc and rest support:
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.2.5.RELEASE</version>
+</dependency>
+_____________________________________________________________________________________________________________________________________________________________
+							2.jackson-databind
+												FOR add jackson for JSON converter
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.11.0</version>
+</dependency>
+_________________________________________________________________________________________________________________________________________________________
+							3.javax.servlet-api
+<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->		FOR springs abstractAnnotationConfigDispatcherServletInitilizer
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+    <scope>provided</scope>
+</dependency>	
+_____________________________________________________________________________________________________________________________________________________________
+							4.add support for the JSP to get rid of jsp issue(error on files)
+<dependency>
+    <groupId>javax.jsp</groupId>
+    <artifactId>javax.servlet.jsp-api</artifactId>
+    <version>2.3.1</version>
+    <scope>provided</scope>
+</dependency>								
+=============================================================================================================================================================
+								STEP 1:	CONFIGRATION FILE 1(AppConfig.java)
+package com.dxc.configration;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.dxc")
+public class AppConfig {
+
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+								STEP 2:CONFIGRATION FILE 2(MySpringMvcDispacherServletInitializer.java)
+package com.dxc.configration;
+
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+public class MySpringMvcDispacherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+		return new Class[] {AppConfig.class} ;
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] {"/"};
+	}
+
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+								STEP3:REST CONTROLLER (DemoRestController.java)
+package com.dxc.rest.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping
+public class DemoRestController {
+
+	//add code for the "/hello" end point
+	
+	@GetMapping("/hello")
+	public String sayHello()
+	{
+		return "hello";
+	}
+	
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+								STEP:2.1 ADDING MORE CLASS AND SENDING POJO AND RECIVING JSON(Student.java)
+package com.dxc.model;
+
+public class Student {
+
+	private String firstName;
+	private String lastName;
+	
+	
+	//default constructor
+	public Student() {
+		super();
+	}
+	
+	//constructor using field
+	public Student(String firstName, String lastName) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
+
+	
+	//getter and setters 
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+									STEP 2.2 STUDENT REST CONTROLLER(StudentRestController.java)
+package com.dxc.rest.demo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dxc.model.Student;
+
+@RestController
+@RequestMapping("/api")
+public class StudentRestController {
+
+	
+	//define the end point for all the student : /api/students
+	@GetMapping("/students")
+	public List<Student>  getStudents()
+	{
+		List<Student> students=new ArrayList<Student>();
+		students.add(new Student("sharat","gangal"));
+		students.add(new Student("ashi","patel"));
+		students.add(new Student("brad","pete"));
+		return students;
+	}
+}
+
+=============================================================================================================================================================
+CHAPTER 2::								USE OF PATH VARIABLES
+											EX:/api/students/1--->gives student {sudentId}
+
+package com.dxc.rest.demo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dxc.model.Student;
+
+@RestController
+@RequestMapping("/api")
+public class StudentRestController {
+
+	//define a field
+	private List<Student> students;
+	
+	//using the post construct to populate the studentList
+	//this method will be called only once when the bean construction
+	
+	@PostConstruct
+	public void loadData()
+	{
+		students=new ArrayList<Student>();
+		students.add(new Student("sharat","gangal"));
+		students.add(new Student("ashi","patel"));
+		students.add(new Student("brad","pete"));
+		
+	}
+	
+	//define the end point for all the student : /api/students
+	@GetMapping("/students")
+	public List<Student>  getStudents()
+	{
+		return students;	
+	}
+	
+	//defining the single student endpoint : /api/student/{id}		
+	
+	@GetMapping("/student/{id}")---------------------------------->====>{id} should match with @PathVariable int id
+	public Student getStudent(@PathVariable int id)			    /else u will get an error
+	{
+		return students.get(id);
+	}
+}
+=============================================================================================================================================================
+								::EXCEPTION HANDLING::
+	Steps 1:Create the custome  error response class
+	Step  2:Create a custom exception class
+	step  3:Update REST service to throw exception if student not found
+	step  4:Add an exception handler method using  @ExceptionHandler
+
+
+
+	STEP1:create a pojo class and add the fields add the var that you want to send as the response. as the json like studentErrorResponse
+	
+	STEP2:create a custom exception class like StudentNotFoundException.
+			2.1 extend runtime exception-->RuntimeException
+			2.2 generate constuctor form super clas -we have 5 constructor
+								we will override only :string,thowable
+										      :string
+										      :thowable
+			THATS IT WE HAVE CREATED OUR CUSTOM EXCEPTION CLASS
+	STEP3:write the logic
+			if you have any condition when you want to throw exception
+			JUST thow exception:
+						Throw new StudentNotFoundExeception("student id is not found -"+id) here exception is our custom exeption
+
+	STEP4:add an exception handler using @ExceptionHandler
+			Since you have thown an exception now you want to handle it and send the correct data so that our entire stack trace is not sent
+			
+		
+			create a method like handleException(pass the custom-exception) and return type is ResponseEntity<StudentErrorResponse>
+			@ExceptionHandler
+			public ResponseEntity<StudentErrorResponse>handleException(StudentNotFoundException e)
+			{
+			1. here create the studenterrorResponse obj i.e is the pojo class i.e StudentErrorResponse
+			StudentErrorResponse errorResponse=new StudentErrorResponse(); 
+			
+			2.set the value for that pojo  error response class
+			errorResponse.setMessage("not found");
+
+			3.we can also set the status like setStatus(HttpStatus.NOT_FOUND.value());
+			4.we can also set the time stamp(System.currentTimeMillies());
+			5.we shoud send the message of the exception tooo so we make use of setMessage(e.getMessage())
+
+			6.return new ResponseEntity<>(error,Httpstatus.NOT_FOUND);
+
+			}
+
+	step5:	WHAT IF WE HAVE THE GENRIC EXCEPTION ?
+			1.just method handling only one exception i will make it to handle Exception exe
+				so  what ever the exception it will catch it.
+			copy what ever  the code in above do the same here.
+
+
+
+
+
+
+
+							
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_____________________________________________________________________________________________________________________________________________________________

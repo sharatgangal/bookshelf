@@ -1,0 +1,114 @@
+Spring Rest ::
+1.JSON -data binding
+-------------------------------------------------------------------------------------------------
+1.What is JSON:
+ . javascript object notation
+ .lightweight data format for storing and exchanging data 
+ .language independent 
+ .can use with any prohramming language
+   example:
+		{
+			"id":1,
+			"firstName":"sharat",
+			"lastName": "gangal",
+			"active":true
+			"courses":null
+		}
+ .curley braces define objects in JSON
+ .Object members are name/value pairs-->delimeted by colons
+ . name are always in double qoutes...."firstName" 
+  JSON value can have
+		1.numbers -> no qoutes
+		2.string -> in double qoutes
+		3.Boolean -> true, false
+		4.Nested JSON Object
+		5.Array
+		6.null
+  nested JSON: example:
+		{
+			"id":1,
+			"firstName":"sharat",
+			"lastName": "gangal",
+			"active":true
+			"courses":null
+			"address:{
+					"street": "1st cross"
+					"city": "badami",
+					"zip":587201
+					"country":"India"
+		       		 }
+			"languages":["java","C#","Java"]
+		}
+		
+_________________________________________________________________________________________________
+2.Java JSON databinding
+------------------------------------------------------------------------------------------------
+Data binding is the process of converting JSON to POJO or vice verse
+
+	JSON<---->Java-POJO
+	
+	Also Know as Mapping,serialization/deserialization,marshalling/Unmarshalling
+_________________________________________________________________________________________________
+3.JSON data binding with jackson
+-------------------------------------------------------------------------------------------------
+  .Spring uses the Jackson project behind the scence
+  .Jackson handles data binding between JSON and Java POJO
+  
+	JackSon Data Binding 
+	Package:: com.fasterxml.jackson.databind
+	maven dependency::
+  can provide support for both xml and json
+_________________________________________________________________________________________________
+4.Jackson data binding 
+  by default jackson will call appropriate getter and setter method
+           		getter---> from pojo to JSON
+			setter---> from JSON to pojo
+  it only call the setter methods it can not access the private variables.
+_________________________________________________________________________________________________
+5.JSON to java POJO 
+-------------------------------------------------------------------------------------------------
+ public class Driver
+	{
+		public static void main(String[] args)
+		{
+			step1: create the Object mapper object
+			ObjectMapper mapper= new ObjectMapper();
+
+			step2:read the Json from file and map/convert to java pojo
+			Student myStudent=mapper.readValue(new File("data/sample.json",Student.class);
+		
+			syso(myStudent.getName());
+			syso(mystudent/getXXX());
+			
+		}
+	}
+_________________________________________________________________________________________________
+6.Java POJO to JSON
+  jackson will call the getter methods
+   	 public class Driver
+	{
+		public static void main(String[] args)
+		{
+			step1: create the Object mapper object
+			ObjectMapper mapper= new ObjectMapper();
+
+			step2:read the Json from file and map/convert to java pojo
+			Student myStudent=mapper.readValue(new File("data/sample.json",Student.class);
+		
+			syso(myStudent.getName());
+			syso(mystudent/getXXX());
+
+			step3: to write json to java pojo
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);---> it will make the output with pretty property
+			mapper.writeValue(new File("/data/outputFile.json",myStudent);
+			
+		}
+	}
+________________________________________________________________________________________________________	
+7. spring and jackson support
+   in spring rest --
+	Json data sent to the REST controler is coverted to pojo
+	Json data being passed to rest  is converted into POJO
+	the data sent from REST controller is converted to Json automatically 
+
+
