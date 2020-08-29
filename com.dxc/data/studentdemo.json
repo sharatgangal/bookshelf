@@ -1,0 +1,15 @@
+{
+			"id":1,
+			"firstName":"sharat",
+			"lastName": "gangal",
+			"active":true,
+			"course":null,
+			"languages":["java","C#","Java"],
+			"address":{
+					"street": "1st cross",
+					"city": "badami",
+					"zip":587201,
+					"country":"India"
+		       		 }
+			
+}
